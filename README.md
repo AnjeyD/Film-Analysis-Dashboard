@@ -1,4 +1,4 @@
-# Film Analysis Dashboard
+# Дашборд для анализа кинематографа
 ### Это многостраничный дашборд для подбора и анализа фильмов, используя данные из датасета FilmTV. <!-- описание репозитория -->
 
 ![Просмотр фильма](https://mykaleidoscope.ru/x/uploads/posts/2023-12/1703421443_mykaleidoscope-ru-p-letnii-kinoteatr-na-dache-pinterest-85.jpg)

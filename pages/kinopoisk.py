@@ -157,15 +157,17 @@ def update_film_cards(selected_genres, selected_years, selected_countries, selec
             [   
                 dbc.CardHeader(
                     html.H4(row['title'], className="card-title"),                                            # Добавляем название
+                    style={'height': '90px', 'text-align': 'center', 'display': 'flex', 'align-items': 'center', 'justify-content': 'center'}
                 ),
                 dbc.CardBody(
                     [
-                        html.H5(row['genre'], className="card-subtitle mb-2 text-muted"),                      # Добавляем жанр
-                        html.P(f"Год: {row['year']}"),                                                         # Добавляем год
-                        html.P(f"Страна: {row['country']}"),                                                   # Добавляем страну
-                        html.P(f"Режиссеры: {row['directors']}"),                                              # Добавляем режисера
-                        html.P(f"Рейтинг: {row['avg_vote']}", className="card-text text-right text-info"),     # Добавляем рейтинг
-                    ]
+                        html.H4(row['genre'], className="card-subtitle mb-2 text-muted"),                      # Добавляем жанр
+                        html.P(f"Год: {row['year']}", style={'fontSize': '1.25rem'}),                                                         # Добавляем год
+                        html.P(f"Страна: {row['country']}", style={'fontSize': '1.25rem'}),                                                   # Добавляем страну
+                        html.P(f"Режиссеры: {row['directors']}", style={'fontSize': '1.25rem'}),                                              # Добавляем режисера
+                        html.P(f"Рейтинг: {row['avg_vote']}", className="card-text text-right text-info", style={'fontSize': '1.25rem'}),     # Добавляем рейтинг
+                    ],
+                    style={'height': '270px'}
                 ),
                 dbc.CardFooter([
                     html.Button("Описание", id=f"description-button-{index}", className="button-text"),
@@ -175,16 +177,16 @@ def update_film_cards(selected_genres, selected_years, selected_countries, selec
                                     [
                                         html.P(f"Описание: {row['description']}"),
                                         html.P(f"Примечания: {row['notes']}")
-                                    ]
+                                    ],
+                                    style={'color': 'primary'}
                                 )
                             ),
                             id=f"description-collapse-{index}",
                             is_open=False,
-                            #color="primary"
                         )
                 ])
             ],
-            style={"width": "18rem", "margin": "10px"}
+            style={"width": "19rem", "margin": "10px"}
         )
         film_cards.append(dbc.Col(card, width=3))
 

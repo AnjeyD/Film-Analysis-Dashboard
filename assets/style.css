@@ -1,0 +1,23 @@
+/* Вставьте это в файл assets/style.css или в раздел <style> вашего HTML шаблона */
+.d-flex {
+    display: flex;
+    flex-direction: column;
+}
+
+.card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1 1 auto;
+}
+
+.card-header h4 {
+    margin: 0; /* Убираем внешние отступы у заголовка */
+    text-align: center; /* Центрируем текст заголовка */    
+}

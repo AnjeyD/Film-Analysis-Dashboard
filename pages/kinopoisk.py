@@ -1,3 +1,4 @@
+import dash
 from dash import html, dcc, callback, Output, Input
 import dash_bootstrap_components as dbc
 import plotly.express as px
@@ -100,7 +101,6 @@ layout = dbc.Container([
             }
         ), style={'width': '95%', 'padding': '0px 20px 20px 20px', 'text_color': 'black'}
     ),
-    html.Br(),
 
     dbc.Row([
         dbc.Col(
@@ -109,6 +109,7 @@ layout = dbc.Container([
     ]),
 
     dbc.Row(id='film-cards-row'),
+    
 ])
 
 # Callback для обновления карточек фильмов по выбранным фильтрам и отображения количества фильмов
@@ -140,7 +141,7 @@ def update_film_cards(selected_genres, selected_years, selected_countries, selec
 
     # Применяем фильтрацию по режиссерам
     if selected_directors:
-        filtered_data = filtered_data[filtered_data['directors'].apply(lambda x: any(director in x.split(', ') for director in selected_directors))]
+        filtered_data = filtered_data[filtered_data['directors'].apply(lambda x: isinstance(x, str) and any(director in x.split(', ') for director in selected_directors))]
 
     # Применяем фильтрацию по рейтингу
     filtered_data = filtered_data[filtered_data['avg_vote'] >= selected_rating]
@@ -152,12 +153,13 @@ def update_film_cards(selected_genres, selected_years, selected_countries, selec
 
     # Создаем карточки для отображения
     film_cards = []
+
     for index, row in filtered_data.iterrows():
         card = dbc.Card(
             [   
                 dbc.CardHeader(
-                    html.H4(row['title'], className="card-title"),                                            # Добавляем название
-                    style={'height': '90px', 'text-align': 'center', 'display': 'flex', 'align-items': 'center', 'justify-content': 'center'}
+                    html.H4(row['title'], className="card-title"),
+                    style={'text-align': 'center', 'height': 'fit-content'},                  
                 ),
                 dbc.CardBody(
                     [
@@ -166,37 +168,40 @@ def update_film_cards(selected_genres, selected_years, selected_countries, selec
                         html.P(f"Страна: {row['country']}", style={'fontSize': '1.25rem'}),                                                   # Добавляем страну
                         html.P(f"Режиссеры: {row['directors']}", style={'fontSize': '1.25rem'}),                                              # Добавляем режисера
                         html.P(f"Рейтинг: {row['avg_vote']}", className="card-text text-right text-info", style={'fontSize': '1.25rem'}),     # Добавляем рейтинг
-                    ],
-                    style={'height': '270px'}
+                    ]
                 ),
                 dbc.CardFooter([
-                    html.Button("Описание", id=f"description-button-{index}", className="button-text"),
-                        dbc.Collapse(
-                            dbc.Card(
-                                dbc.CardBody(
-                                    [
-                                        html.P(f"Описание: {row['description']}"),
-                                        html.P(f"Примечания: {row['notes']}")
-                                    ],
-                                    style={'color': 'primary'}
-                                )
-                            ),
-                            id=f"description-collapse-{index}",
-                            is_open=False,
-                        )
+                    dbc.Button("Описание", id=f"description-button-{index}", color="primary", className="mb-3"),
+                    dbc.Modal([
+                        dbc.ModalHeader([
+                            html.P(f"{row['title']}", className="modal-title", style={'fontSize': '1.75rem', 'align-text': 'center'})
+                        ]),
+                        dbc.ModalBody([
+                            html.P(f"Описание: {row['description']}", style={'fontSize': '1.25rem'}),
+                            html.P(f"Примечания: {row['notes']}", style={'fontSize': '1.25rem'})
+                        ]),
+                        dbc.ModalFooter(
+                            dbc.Button("Закрыть", id=f"close-button-{index}", className="ml-auto")
+                        ),
+                    ], id=f"modal-{index}", size="lg")
                 ])
             ],
             style={"width": "19rem", "margin": "10px"}
         )
-        film_cards.append(dbc.Col(card, width=3))
+    
+        film_cards.append(dbc.Col(card, width=3, className="d-flex align-items-stretch"))
+
 
     return f"Найдено фильмов: {film_count}", film_cards
 
-# Callback для раскрытия/скрытия описания по клику на кнопку "Описание"
 for index, row in df.iterrows():
     @callback(
-        Output(f"description-collapse-{index}", "is_open"),
-        [Input(f"description-button-{index}", "n_clicks")]
+        Output(f"modal-{index}", "is_open"),
+        [Input(f"description-button-{index}", "n_clicks"),
+         Input(f"close-button-{index}", "n_clicks")],
+        [dash.dependencies.State(f"modal-{index}", "is_open")]
     )
-    def toggle_collapse(n):
-        return n is not None and n % 2 == 1
+    def toggle_modal(n1, n2, is_open):
+        if n1 or n2:
+            return not is_open
+        return is_open
